@@ -1,0 +1,47 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="header">
+        <nav class="#42a5f5 blue lighten-1">
+            <div class="nav-wrapper">
+                <a href="/" class="brand-logo">&nbsp;&nbsp;Ding&nbsp;&nbsp;</a>
+                <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="/">首页</a></li>
+                    <li><a href="/ding/start">开始打卡</a></li>
+                    <li><a href="/device/list">查看设备</a></li>
+                </ul>
+            </div>
+        </nav>
+        <ul class="sidenav" id="mobile-demo">
+            <li><a href="/">首页</a></li>
+            <li><a href="/ding/start">开始打卡</a></li>
+            <li><a href="/device/list">查看设备</a></li>
+        </ul>
+        <script>
+            <!--移动设备 侧边栏参数-->
+            var mobileOptions = {
+                edge: 'left',
+                draggable: true,
+                inDuration: 250,
+                outDuration: 200,
+                onOpenStart: null,
+                onOpenEnd: null,
+                onCloseStart: null,
+                onCloseEnd: null,
+                preventScrolling: true
+            };
+            document.addEventListener('DOMContentLoaded', function() {
+                var elems = document.querySelectorAll('.sidenav');
+                var instances = M.Sidenav.init(elems, mobileOptions);
+            });
+        </script>
+    </div>
+</body>
+</html>
+
+
+
+
+
+

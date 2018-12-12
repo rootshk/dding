@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>打卡</title>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+    <div th:include="common/header :: header"></div>
+    <table>
+        <thead>
+        <tr>
+            <th data-field="id">设备ID</th>
+            <th data-field="user">绑定者</th>
+            <th data-field="active">操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="blogId, key : ${devices}">
+            <td th:text="${key.current.key}">Onions</td>
+            <td th:text="${key.current.value}">-</td>
+            <td>
+                <a class="waves-effect waves-light btn" th:href="@{/ding/ding(deviceId=${key.current.key})}">打卡</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</body>
+</html>

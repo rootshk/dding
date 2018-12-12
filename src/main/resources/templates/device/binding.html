@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>绑定设备</title>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<div th:include="common/header :: header"></div>
+<form action="/device/binding" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <input type="hidden" name="deviceId" th:value="${deviceId}">
+    <div class="row">
+        <div class="input-field col s12">
+            设备名: <p th:text="${deviceId}"></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s12">
+            <input placeholder="用于显示的名称" id="name" name="username" type="text" class="validate">
+            <label for="name">名称</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s12">
+            <input placeholder="执行打卡时的密码" id="password" name="password" type="password" class="validate">
+            <label for="password">密码</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="input-field col s12">
+            <button class="btn waves-effect waves-light" type="submit">提交
+                <i class="material-icons right">send</i>
+            </button>
+        </div>
+    </div>
+</form>
+</body>
+</html>

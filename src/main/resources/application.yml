@@ -1,0 +1,7 @@
+server:
+  port: 9603
+spring:
+  security:
+    user:
+      name: root
+      password: root

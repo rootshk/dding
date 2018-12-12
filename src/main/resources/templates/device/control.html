@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>设备控制</title>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<div th:include="common/header :: header"></div>
+<div class="row">
+    <form action="/device/control" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="deviceId" th:value="${deviceId}">
+        <input type="hidden" id="x" name="x" value="0">
+        <input type="hidden" id="y" name="y" value="0">
+        <div class="input-field col s6">
+            <select name="type">
+                <option id="typeKeyevent" value="keyevent">按键</option>
+                <option id="typeTap" value="tap">点击</option>
+                <option id="typeSwipe" value="swipe" disabled>滑动</option>
+            </select>
+            <label>操作类型</label>
+        </div>
+        <div class="input-field col s6">
+            <select id="keyevent" name="keyevent">
+                <option value="26">电源键</option>
+                <option value="24">音量+</option>
+                <option value="25">音量-</option>
+                <option value="1">菜单键</option>
+                <option value="3">主页键</option>
+                <option value="4">返回键</option>
+            </select>
+            <label>按键操作</label>
+        </div>
+        <img id="ss" th:src="${'data:image/png;base64,' + imageSrc}" th:width="${width}" th:height="${height}" style="display: none; overflow: hidden;" alt=""/>
+        <img id="map" src="/resources/images/this.png" style="display: none; overflow: hidden;" alt=""/>
+        <canvas id="myCanvas" style="border:1px solid #000000;"></canvas>
+        <div class="row">
+            <div class="input-field col s12">
+                <input placeholder="输入需要写入的文字" id="inputValue" name="inputValue" type="text" class="validate">
+                <label for="inputValue">输入</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <button class="btn waves-effect waves-light" type="submit">提交
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var c=document.getElementById("myCanvas");//CANVAS
+    var $keyevent = document.getElementById("keyevent");//按钮
+    var $typeKeyevent = document.getElementById("typeKeyevent");//按键
+    var $typeTap = document.getElementById("typeTap");//点击
+    var $typeSwipe = document.getElementById("typeSwipe");//滑动
+    var inputX = document.getElementById("x");//X
+    var inputY = document.getElementById("y");//Y
+    var img = document.getElementById("ss");//图片
+    var map = document.getElementById("map");//图片
+    var displayW = window.screen.width;//显示屏的宽度
+    var displayH = window.screen.height;//显示屏的高度
+    var canvasH;//CANVAS的高度
+    var canvasW;//CANVAS的宽度
+    var touchX;//最后触摸的CANVAS坐标X
+    var touchY;//最后触摸的CANVAS坐标Y
+    var photoX;//实际点击图片的坐标X
+    var photoY;//实际点击图片的坐标Y
+    var proportion = 1;//缩放比例
+    // var displayProportion = 0.8;//显示比例
+    var displayProportion = 1;//显示比例
+
+    //如果屏幕的长度小于截图的长度(需要缩小)
+    if (img.height > displayH) {
+        proportion = img.height / displayH;//缩放比例
+    }
+    canvasH = (img.height / proportion) * displayProportion;
+    canvasW = (img.width / proportion) * displayProportion;
+    c.height = canvasH;
+    c.width = canvasW;
+
+    var ctx = c.getContext("2d");
+    ctx.drawImage(img, 0, 0, canvasW, canvasH);
+
+    //对事件进行监听
+    c.addEventListener('click', function(e){
+        var p = getEventPosition(e);
+        //加入一个触摸图标
+        ctx.drawImage(img, 0, 0, canvasW, canvasH);
+        ctx.drawImage(map, p.x - 15, p.y - 30);
+        $typeTap.selected = true;
+    }, false);
+
+    //按键操作点击事件
+    $keyevent.addEventListener('click', function(e){
+        $typeSwipe.selected = false;
+        $typeTap.selected = false;
+        $typeKeyevent.selected = true;
+    }, false);
+
+    //注：使用这个函数，需要给Canvas元素的position设为absolute。
+    //要判断事件对象发生的位置，事件对象e的layerX和layerY属性表示Canvas内部坐标系中的坐标
+    function getEventPosition(ev){
+        var x, y;
+        if (ev.layerX || ev.layerX === 0) {
+            x = ev.layerX;
+            y = ev.layerY;
+        } else if (ev.offsetX || ev.offsetX === 0) { // Opera
+            x = ev.offsetX;
+            y = ev.offsetY;
+        }
+        touchX = x;
+        touchY = y;
+        photoX = x / displayProportion * proportion;
+        photoY = y / displayProportion * proportion;
+
+        //设置参数
+        inputX.value = Math.floor(photoX);
+        inputY.value = Math.floor(photoY);
+        console.log(photoX);
+        console.log(photoY);
+        return {x: x, y: y};
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems, {});
+    });
+</script>
+</body>
+</html>
