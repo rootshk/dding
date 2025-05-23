@@ -339,6 +339,37 @@
         var elems = document.querySelectorAll('select');
         var instances = M.FormSelect.init(elems, {});
     });
+
+    function executeControl(type, x, y, endX, endY, keyevent, inputValue) {
+        const deviceId = document.getElementById('deviceId').value;
+        fetch(`/device/control/${deviceId}/action`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                type: type,
+                x: x,
+                y: y,
+                endX: endX,
+                endY: endY,
+                keyevent: keyevent,
+                inputValue: inputValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 200) {
+                M.toast({html: '操作成功', classes: 'green'});
+                setTimeout(() => refreshScreenshot(), 500);
+            } else {
+                M.toast({html: data.message, classes: 'red'});
+            }
+        })
+        .catch(error => {
+            M.toast({html: '操作失败', classes: 'red'});
+        });
+    }
 </script>
 </body>
 </html>

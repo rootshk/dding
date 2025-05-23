@@ -10,37 +10,131 @@
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <!--Let browser know website is optimized for mobile-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <style>
+        .device-card {
+            margin-bottom: 20px;
+        }
+        .device-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .status-connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .status-disconnected {
+            background-color: #F44336;
+            color: white;
+        }
+        .device-actions {
+            margin-top: 15px;
+        }
+        .device-actions .btn {
+            margin-right: 10px;
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
 <div th:include="common/header :: header"></div>
 
-<table class="striped">
-    <thead>
-    <tr>
-        <th data-field="id">设备ID</th>
-        <th data-field="username">用户</th>
-        <th data-field="binding">状态</th>
-        <th data-field="active">操作</th>
-    </tr>
-    </thead>
+<div class="container">
+    <h4 class="center-align">设备列表</h4>
+    
+    <div class="row">
+        <div class="col s12 m6 l4" th:each="device : ${devices}">
+            <div class="card device-card">
+                <div class="card-content">
+                    <span class="card-title" th:text="${device.name}">设备名称</span>
+                    <span class="device-status" th:classappend="${device.status == 'connected' ? 'status-connected' : 'status-disconnected'}"
+                          th:text="${device.status == 'connected' ? '已连接' : '未连接'}">状态</span>
+                    
+                    <p>
+                        <strong>设备ID：</strong><span th:text="${device.id}"></span><br>
+                        <strong>型号：</strong><span th:text="${device.model}"></span><br>
+                        <strong>IP地址：</strong><span th:text="${device.ipAddress}"></span><br>
+                        <strong>最后连接：</strong><span th:text="${#temporals.format(device.lastConnectedTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </p>
+                    
+                    <div class="device-actions">
+                        <a th:href="@{/device/control/{id}(id=${device.id})}" 
+                           class="btn waves-effect waves-light" 
+                           th:disabled="${device.status != 'connected'}">
+                            <i class="material-icons left">control_camera</i>控制
+                        </a>
+                        <button class="btn waves-effect waves-light" 
+                                th:onclick="'connectDevice(\'' + ${device.id} + '\')'"
+                                th:disabled="${device.status == 'connected'}">
+                            <i class="material-icons left">link</i>连接
+                        </button>
+                        <button class="btn waves-effect waves-light red" 
+                                th:onclick="'disconnectDevice(\'' + ${device.id} + '\')'"
+                                th:disabled="${device.status != 'connected'}">
+                            <i class="material-icons left">link_off</i>断开
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <tbody>
-    <tr th:each="device : ${devices}">
-        <td th:text="${device}">设备ID</td>
+<a href="/device" class="btn-floating btn-large waves-effect waves-light refresh-btn">
+    <i class="material-icons">refresh</i>
+</a>
 
-        <td th:if="${deviceMap.containsKey(device)}"><p th:text="${deviceMap.get(device)}"></p></td>
-        <td th:unless="${deviceMap.containsKey(device)}">-</td>
+<script>
+    function connectDevice(id) {
+        fetch('/device/connect/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 200) {
+                M.toast({html: '设备连接成功', classes: 'green'});
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                M.toast({html: data.message, classes: 'red'});
+            }
+        })
+        .catch(error => {
+            M.toast({html: '操作失败', classes: 'red'});
+        });
+    }
 
-        <td th:if="${deviceMap.containsKey(device)}">已绑定</td>
-        <td th:unless="${deviceMap.containsKey(device)}">未绑定</td>
-
-        <td>
-            <a class="waves-effect waves-light btn" th:href="@{/device/control(deviceId=${device})}">控制</a>
-            <a class="waves-effect waves-light btn" th:href="@{/device/binding(deviceId=${device})}" th:unless="${deviceMap.containsKey(device)}">绑定</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    function disconnectDevice(id) {
+        fetch('/device/disconnect/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 200) {
+                M.toast({html: '设备已断开', classes: 'green'});
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                M.toast({html: data.message, classes: 'red'});
+            }
+        })
+        .catch(error => {
+            M.toast({html: '操作失败', classes: 'red'});
+        });
+    }
+</script>
 </body>
 </html>

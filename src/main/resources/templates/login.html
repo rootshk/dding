@@ -15,68 +15,70 @@
         }
         main {
             flex: 1 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .login-container {
-            margin-top: 100px;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
         }
         .card {
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        .card-content {
+            padding: 30px;
+        }
         .card-title {
-            font-size: 24px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #26a69a;
+        }
+        .input-field {
             margin-bottom: 20px;
         }
         .btn {
             width: 100%;
             margin-top: 20px;
         }
+        .error-message {
+            color: #f44336;
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <main>
-        <div class="container">
-            <div class="row login-container">
-                <div class="col s12 m6 offset-m3">
-                    <div class="card">
-                        <div class="card-content">
-                            <span class="card-title center-align">设备控制系统</span>
-                            <form th:action="@{/login}" method="post">
-                                <div class="row">
-                                    <div class="input-field col s12">
-                                        <i class="material-icons prefix">account_circle</i>
-                                        <input id="username" name="username" type="text" class="validate" required>
-                                        <label for="username">用户名</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="input-field col s12">
-                                        <i class="material-icons prefix">lock</i>
-                                        <input id="password" name="password" type="password" class="validate" required>
-                                        <label for="password">密码</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col s12">
-                                        <button class="btn waves-effect waves-light" type="submit">
-                                            登录
-                                            <i class="material-icons right">send</i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row" th:if="${param.error}">
-                                    <div class="col s12">
-                                        <p class="red-text center-align">用户名或密码错误</p>
-                                    </div>
-                                </div>
-                                <div class="row" th:if="${param.logout}">
-                                    <div class="col s12">
-                                        <p class="green-text center-align">您已成功退出</p>
-                                    </div>
-                                </div>
-                            </form>
+        <div class="login-container">
+            <div class="card">
+                <div class="card-content">
+                    <h4 class="card-title">设备控制台</h4>
+                    
+                    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+                    
+                    <form action="/login" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        
+                        <div class="input-field">
+                            <i class="material-icons prefix">person</i>
+                            <input id="username" name="username" type="text" class="validate" required>
+                            <label for="username">用户名</label>
                         </div>
-                    </div>
+                        
+                        <div class="input-field">
+                            <i class="material-icons prefix">lock</i>
+                            <input id="password" name="password" type="password" class="validate" required>
+                            <label for="password">密码</label>
+                        </div>
+                        
+                        <button class="btn waves-effect waves-light" type="submit">
+                            登录
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
