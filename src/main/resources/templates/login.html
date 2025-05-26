@@ -56,24 +56,22 @@
             <div class="card">
                 <div class="card-content">
                     <h4 class="card-title">设备控制台</h4>
-                    
+
                     <div th:if="${error}" class="error-message" th:text="${error}"></div>
-                    
+
                     <form action="/login" method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        
                         <div class="input-field">
                             <i class="material-icons prefix">person</i>
                             <input id="username" name="username" type="text" class="validate" required>
                             <label for="username">用户名</label>
                         </div>
-                        
+
                         <div class="input-field">
                             <i class="material-icons prefix">lock</i>
                             <input id="password" name="password" type="password" class="validate" required>
                             <label for="password">密码</label>
                         </div>
-                        
+
                         <button class="btn waves-effect waves-light" type="submit">
                             登录
                             <i class="material-icons right">send</i>
@@ -86,4 +84,4 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
-</html> 
+</html>
