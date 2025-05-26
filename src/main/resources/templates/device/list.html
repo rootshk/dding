@@ -72,13 +72,13 @@
                            th:disabled="${device.status != 'connected'}">
                             <i class="material-icons left">control_camera</i>控制
                         </a>
-                        <button class="btn waves-effect waves-light" 
-                                th:onclick="'connectDevice(\'' + ${device.id} + '\')'"
+                        <button class="btn waves-effect waves-light connect-btn" 
+                                th:data-id="${device.id}"
                                 th:disabled="${device.status == 'connected'}">
                             <i class="material-icons left">link</i>连接
                         </button>
-                        <button class="btn waves-effect waves-light red" 
-                                th:onclick="'disconnectDevice(\'' + ${device.id} + '\')'"
+                        <button class="btn waves-effect waves-light red disconnect-btn" 
+                                th:data-id="${device.id}"
                                 th:disabled="${device.status != 'connected'}">
                             <i class="material-icons left">link_off</i>断开
                         </button>
@@ -94,6 +94,22 @@
 </a>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 为所有连接按钮添加事件监听器
+        document.querySelectorAll('.connect-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                connectDevice(this.getAttribute('data-id'));
+            });
+        });
+        
+        // 为所有断开按钮添加事件监听器
+        document.querySelectorAll('.disconnect-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                disconnectDevice(this.getAttribute('data-id'));
+            });
+        });
+    });
+
     function connectDevice(id) {
         fetch('/device/connect/' + id, {
             method: 'POST',
