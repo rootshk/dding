@@ -74,8 +74,18 @@ public class Utils {
     public static BufferedImage GetImage(String path) {
         BufferedImage image = null;
         try {
-            image = ImageIO.read(new File(path));
+            File imageFile = new File(path);
+            System.out.println("尝试读取图片文件: " + imageFile.getAbsolutePath());
+            System.out.println("文件是否存在: " + imageFile.exists());
+            System.out.println("文件是否可读: " + imageFile.canRead());
+            
+            if (imageFile.exists() && imageFile.canRead()) {
+                image = ImageIO.read(imageFile);
+            } else {
+                System.err.println("图片文件不存在或无法读取: " + path);
+            }
         } catch (IOException e) {
+            System.err.println("读取图片文件时出错: " + e.getMessage());
             e.printStackTrace();
         }
         return image;
@@ -86,12 +96,20 @@ public class Utils {
         byte[] data = null;
         //读取图片字节数组
         try {
-            in = new FileInputStream(imgFile);
+            File file = new File(imgFile);
+            if (!file.exists() || !file.canRead()) {
+                System.err.println("图片文件不存在或无法读取: " + imgFile);
+                return "";
+            }
+            
+            in = new FileInputStream(file);
             data = new byte[in.available()];
             in.read(data);
             in.close();
         } catch (IOException e) {
+            System.err.println("读取图片文件时出错: " + e.getMessage());
             e.printStackTrace();
+            return "";
         }
         //对字节数组Base64编码
         return Base64.getEncoder().encodeToString(data);//返回Base64编码过的字节数组字符串
@@ -118,16 +136,29 @@ public class Utils {
 
     public static String GetSrreenPath(String deviceId) {
         Utils.RunProcess("adb -s " + deviceId + " shell /system/bin/screencap -p /sdcard/screenshot-" + deviceId + ".png");
-        if (System.getProperty("os.name").contains("Windows"))
-            Utils.RunProcess("adb -s " + deviceId + " pull /sdcard/screenshot-" + deviceId + ".png D:\\\\roothk");
-        else
-            Utils.RunProcess("adb -s " + deviceId + " pull /sdcard/screenshot-" + deviceId + ".png /data/roothk");
+        
+        // 创建临时目录
+        String tempDir = System.getProperty("java.io.tmpdir");
+        File screenshotDir = new File(tempDir + File.separator + "roothk");
+        if (!screenshotDir.exists()) {
+            screenshotDir.mkdirs();
+        }
+        
+        String localPath = screenshotDir.getAbsolutePath() + File.separator + "screenshot-" + deviceId + ".png";
+        System.out.println("保存截图到: " + localPath);
+        
+        // 从设备拉取截图
+        Utils.RunProcess("adb -s " + deviceId + " pull /sdcard/screenshot-" + deviceId + ".png \"" + localPath + "\"");
         Utils.RunProcess("adb -s " + deviceId + " shell rm /sdcard/screenshot-" + deviceId + ".png");
-        String imgPath = null;
-        if (System.getProperty("os.name").contains("Windows"))
-            imgPath = "D:\\\\roothk\\screenshot-" + deviceId + ".png";
-        else
-            imgPath = "/data/roothk/screenshot-" + deviceId + ".png";
-        return imgPath;
+        
+        // 检查文件是否成功拉取
+        File screenshotFile = new File(localPath);
+        if (!screenshotFile.exists()) {
+            System.err.println("截图文件未成功拉取: " + localPath);
+        } else {
+            System.out.println("截图文件已成功拉取，大小: " + screenshotFile.length() + " 字节");
+        }
+        
+        return localPath;
     }
 }
