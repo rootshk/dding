@@ -83,7 +83,7 @@
 <div class="container">
     <div class="row">
         <form action="/device/control" method="post">
-            <input type="hidden" name="deviceId" th:value="${deviceId}">
+            <input type="hidden" name="deviceId" id="deviceId" th:value="${deviceId}">
             <input type="hidden" id="x" name="x" value="0">
             <input type="hidden" id="y" name="y" value="0">
             <input type="hidden" id="endX" name="endX" value="0">
@@ -337,10 +337,24 @@
     document.addEventListener('DOMContentLoaded', function() {
         var elems = document.querySelectorAll('select');
         var instances = M.FormSelect.init(elems, {});
+        
+        // 检查deviceId是否存在
+        var deviceId = document.getElementById('deviceId').value;
+        console.log('当前deviceId:', deviceId);
+        if (!deviceId) {
+            console.error('deviceId未获取到!');
+            M.toast({html: '设备ID未获取到，请返回设备列表重新选择设备', classes: 'red'});
+        }
     });
 
     function executeControl(type, x, y, endX, endY, keyevent, inputValue) {
         const deviceId = document.getElementById('deviceId').value;
+        if (!deviceId) {
+            M.toast({html: '设备ID未获取到，无法执行操作', classes: 'red'});
+            return;
+        }
+        
+        console.log('执行操作，设备ID:', deviceId);
         fetch(`/device/control/${deviceId}/action`, {
             method: 'POST',
             headers: {
@@ -368,6 +382,26 @@
         .catch(error => {
             M.toast({html: '操作失败', classes: 'red'});
         });
+    }
+
+    function refreshScreenshot() {
+        const deviceId = document.getElementById('deviceId').value;
+        if (!deviceId) {
+            return;
+        }
+        
+        fetch(`/device/screenshot/${deviceId}`)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                img.src = url;
+                setTimeout(() => {
+                    resetCanvas();
+                }, 100);
+            })
+            .catch(error => {
+                console.error('刷新截图失败:', error);
+            });
     }
 </script>
 </body>
