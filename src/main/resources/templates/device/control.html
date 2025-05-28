@@ -16,7 +16,6 @@
 <div th:include="common/header :: header"></div>
 <div class="row">
     <form action="/device/control" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" name="deviceId" th:value="${deviceId}">
         <input type="hidden" id="x" name="x" value="0">
         <input type="hidden" id="y" name="y" value="0">
